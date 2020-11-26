@@ -6,7 +6,7 @@
 
 
 [Server Parameters]
-host: learnoise.osc-fr1.scalingo.io 
+host: api-brainexp.osc-fr1.scalingo.io 
 ;localhost REPLACE BY SCALINGO HERE ?  
 port: 5000  
 cutoff_time: 120         
