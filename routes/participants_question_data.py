@@ -17,7 +17,8 @@ def create_question_participant(participant_id,block_id,prolific_id):
 
      participant.participant_id  = int(participant_id)
      participant.prolific_id     = str(prolific_id)
-     
+
+     participant.handle          = content['handle'])
      participant.block_number    = int(content['block_number'])
      participant.block_name      = str(content['block_name'])  
      participant.question_ids    = str(content['question_ids'])
