@@ -1,5 +1,5 @@
 """User model"""
-from sqlalchemy import Column, Integer, BigInteger, ForeignKey, DATETIME, Float, VARCHAR,Text
+from sqlalchemy import Column, Integer, ForeignKey, DATETIME, Float, VARCHAR,Text
 
 from models.db import Model
 from models.base_object import BaseObject
@@ -13,14 +13,17 @@ class ParticipantsDataBanditGame(BaseObject, Model):
     '''
     id = Column(Integer, primary_key=True)
 
-    participant_id    = Column(BigInteger, nullable=False)
+    participant_id    = Column(Integer, nullable=False)
     prolific_id       = Column(VARCHAR(length=200))
 
     game_id           = Column(Integer, nullable=False) 
     
     date_time         = Column(VARCHAR(length=200)) # date time start of the experiment 
     
-    block_number       = Column(BigInteger, nullable=False)
+    block_number       = Column(Integer, nullable=False)
+    block_learning     = Column(Integer, nullable=False)
+    block_feedback     = Column(Integer, nullable=False)
+    
     chosen_symbols     = Column(Text(length=10000), nullable=False)     
     chosen_positions   = Column(Text(length=10000), nullable=False)    
     chosen_rewards     = Column(Text(length=10000), nullable=False) 
@@ -28,9 +31,6 @@ class ParticipantsDataBanditGame(BaseObject, Model):
     reward1            = Column(Text(length=10000), nullable=False) 
     reward2            = Column(Text(length=10000), nullable=False)    
     reaction_time      = Column(Text(length=10000), nullable=False)
-    confidence         = Column(Text(length=10000), nullable=False)
-    reaction_time_conf = Column(Text(length=10000), nullable=False) 
-    confidence_init    = Column(Text(length=10000), nullable=False)
       
     
     # Related to the performances: 
@@ -59,19 +59,15 @@ class ParticipantsDataBanditGame(BaseObject, Model):
 
     def get_chosen_positions(self): 
         return str(self.chosen_positions)
-    
+
     def get_chosen_rewards(self): 
         return str(self.chosen_rewards)
 
     def get_unchosen_rewards(self): 
         return str(self.chosen_rewards)
-    
-    
+
     def get_reaction_time(self): 
         return str(self.reaction_time)
-
-    def get_confidence(self): 
-        return str(self.confidence)
 
     def get_date_time(self): 
         return str(self.date_time)
@@ -83,7 +79,7 @@ class ParticipantsDataBanditGame(BaseObject, Model):
         return str(self.completed)
     
     def errors(self):
-        errors = super(ParticipantsData, self).errors()
+        errors = super(ParticipantsDataBanditGame, self).errors()
         return errors
  
      

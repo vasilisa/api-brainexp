@@ -11,7 +11,7 @@ import numpy as np
 
 
 @app.route("/participants_question_data_followup/create/<participant_id>/<block_id>/<prolific_id>", methods=["POST","GET"])
-def create_question_participant(participant_id,block_id,prolific_id):
+def create_question_participant_followup(participant_id,block_id,prolific_id):
      content     = request.json        
      participant = ParticipantsQuestionDataFollowUp()
 
@@ -37,9 +37,9 @@ def create_question_participant(participant_id,block_id,prolific_id):
 # To ge the data from this table 
 @app.route('/participants_question_data_followup/<participant_id>/<block_id>', methods=['GET'])
 
-def get_participant_question_data(participant_id,block_id):
+def get_participant_question_data_followup(participant_id,block_id):
 
-    query = ParticipantsQuestionData.query.filter(ParticipantsQuestionData.participant_id==participant_id, ParticipantsQuestionData.block_number==block_id)
+    query = ParticipantsQuestionDataFollowUp.query.filter(ParticipantsQuestionData.participant_id==participant_id, ParticipantsQuestionData.block_number==block_id)
     if query != None:
         print('Exists')
         

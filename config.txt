@@ -2,7 +2,8 @@
 
 
 [Database Parameters]
-; database_url: mysql://root:pwd@localhost/covid19 // replaced by the OSC SCALINGO DB params
+;database_url: mysql://root:pwd@localhost/brainexp  
+;comment for SCALINGO replaced by the OSC SCALINGO DB params
 
 
 [Server Parameters]

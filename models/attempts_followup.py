@@ -1,10 +1,10 @@
 """User model"""
-from sqlalchemy import Column, Integer, BigInteger, ForeignKey, DATETIME, Float, VARCHAR,Text
+from sqlalchemy import Column, Integer, BigInteger, VARCHAR,Text, JSON
 
 from models.db import Model
 from models.base_object import BaseObject
 
-class ParticipantsDataBonus(BaseObject, Model):
+class AttemptsFollowUp(BaseObject, Model):
 
     '''
         This is the table where we put the collected data from the participants in the RLVARTASK: this excludes the task specifications which 
@@ -13,12 +13,14 @@ class ParticipantsDataBonus(BaseObject, Model):
     '''
     id = Column(Integer, primary_key=True)
 
-    participant_id    = Column(BigInteger,nullable=False)
-    prolific_id       = Column(VARCHAR(length=200), nullable=False)
+    participant_id    = Column(BigInteger, nullable=False)
+    prolific_id       = Column(VARCHAR(length=200))
     date_time         = Column(VARCHAR(length=200)) # date time start of the experiment 
-    bonus             = Column(VARCHAR(length=100), nullable=False)
+    date_time_end     = Column(VARCHAR(length=200)) # the post time of the log 
+    log               = Column(JSON, nullable=False) # all data are posted as a JSON In one cell 
+    log_type          = Column(Text(length=200), nullable=False)
+
     
-     # uncompleted if this is not the last block or "aborted" if the user closes the browser or hits the return button?   
      
     def get_id(self):
         return str(self.id)
@@ -29,15 +31,20 @@ class ParticipantsDataBonus(BaseObject, Model):
     def get_prolific_id(self):
         return str(self.prolific_id)
 
-    def get_bonus(self): 
-        return str(self.bonus)
+    def get_log(self):
+        return str(self.log)
+
+    def get_log_type(self): 
+        return str(self.log_type)
 
     def get_date_time(self): 
         return str(self.date_time)
 
-
+    def get_date_time_end(self): 
+        return str(self.date_time_end)
+ 
     def errors(self):
-        errors = super(ParticipantsDataBonus, self).errors()
+        errors = super(AttemptsFollowUp, self).errors()
         return errors
  
      

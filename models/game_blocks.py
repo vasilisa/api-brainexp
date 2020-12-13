@@ -13,6 +13,8 @@ class GameBlocks(BaseObject, Model):
     block_number        = Column(Integer,nullable=False)
     block_type          = Column(VARCHAR(length=1000),nullable=False)
     block_feedback      = Column(Integer,nullable=False)
+    block_learning      = Column(Integer,nullable=False)
+    
     reward_1            = Column(VARCHAR(length=1000),nullable=False)      
     reward_2            = Column(VARCHAR(length=1000),nullable=False)
     th_reward_1         = Column(VARCHAR(length=1000),nullable=False)
@@ -34,6 +36,9 @@ class GameBlocks(BaseObject, Model):
 
     def get_block_type(self):
         return str(self.block_type)
+
+    def get_block_learning(self):
+        return str(self.block_learning)
 
     def get_reward_1(self):
         return str(self.reward_1)

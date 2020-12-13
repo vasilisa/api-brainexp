@@ -35,7 +35,9 @@ def get_game_block(game_id,block_id):
     arr_block_feedback       = block.get_block_feedback()[0].replace('  ',' ').split(' ')
     result['block_feedback'] = arr_block_feedback[0]
     
-    
+    arr_block_learning       = block.get_block_learning()[0].replace('  ',' ').split(' ')
+    result['block_learning'] = arr_block_learning[0]
+
     arr_reward_1             = numpy.array(block.get_reward_1()[1:-1].replace('  ',' ').split(' '))
     result['reward_1']       = {i : arr_reward_1[i] for i in range(0, len(arr_reward_1))}
 

@@ -1,5 +1,5 @@
 """User model"""
-from sqlalchemy import Column, Integer, BigInteger, ForeignKey, DateTime, Float, VARCHAR
+from sqlalchemy import Column, Integer, ForeignKey, DateTime, Float, VARCHAR
 
 from models.db import Model
 from models.base_object import BaseObject
@@ -12,6 +12,8 @@ class Games(BaseObject, Model):
     game_id            = Column(Integer, nullable=False)
     block_number       = Column(Integer, nullable=False)
     block_feedback     = Column(Integer, nullable=False)
+    block_learning     = Column(Integer, nullable=False)
+    
     symbol_1           = Column(VARCHAR(length=1000), nullable=False) 
     symbol_2           = Column(VARCHAR(length=1000), nullable=False)
     # shape              = Column(VARCHAR(length=100), nullable=False) 
@@ -31,6 +33,9 @@ class Games(BaseObject, Model):
     # sanity check not really used here 
     def get_block_feedback(self):
         return str(self.block_feedback)
+
+    def get_block_learning(self):
+        return str(self.block_learning)
 
     def get_symbol_1(self):
         return str(self.symbol_1)

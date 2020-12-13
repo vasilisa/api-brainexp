@@ -6,30 +6,21 @@ from collections import OrderedDict
 import numpy
 from datetime import datetime
 import json
+import math
 import glob
 from sqlalchemy.sql.expression import func
 
 
-@app.route("/participants_data/last_participant_id", methods=["GET"])
-def get_last_participant_id():
-
-	query  = db.db.session.query(func.max(ParticipantsData.participant_id)).first_or_404()
-
-	if query[0] is not None:
-		result = dict({"new_participant_id": str(int(query[0]) + 1)})
-	else:
-		result = dict({"new_participant_id": str(1)})
-
-	return jsonify(result)
-
-@app.route("/participants_data/create/<participant_id>/<block_id>/<prolific_id>", methods=["POST", "GET"])
-def create_participant(participant_id, block_id, prolific_id):
+@app.route("/participants_data_banditgame/create/<participant_id>/<block_id>/<prolific_id>", methods=["POST", "GET"])
+def create_participant_banditgame(participant_id, block_id, prolific_id):
      content                        = request.json        
-     participant                    = ParticipantsData()
+     participant                    = ParticipantsDataBanditGame()
 
      participant.participant_id     = int(participant_id)
      participant.prolific_id        = str(prolific_id)
      participant.block_number       = int(content['block_number'])
+     participant.block_feedback     = int(content['block_feedback'])
+     participant.block_learning     = int(content['block_learning'])
      participant.chosen_symbols     = str(content['chosen_symbols'])
      participant.chosen_positions   = str(content['chosen_positions'])
      participant.chosen_rewards     = str(content['chosen_rewards'])
@@ -38,9 +29,6 @@ def create_participant(participant_id, block_id, prolific_id):
      participant.reward2            = str(content['reward_2'])
      participant.reaction_time      = str(content['reaction_times'])
      participant.game_id            = int(content['game_id'])
-     participant.confidence         = str(content['confidence'])
-     participant.reaction_time_conf = str(content['reaction_times_conf'])
-     participant.confidence_init    = str(content['confidence_init'])
      
 
      # Add the performance metrics here 
@@ -49,7 +37,6 @@ def create_participant(participant_id, block_id, prolific_id):
      # "yes" for the last finished block 
      # " aborted" : if the user closes the browser or is idle for more than 10 min on the task, the task window closes itseld 
 
-     participant.date       = content['date']
      participant.date_time  = str(content['date_time'])
      
      BaseObject.check_and_save(participant)
@@ -59,23 +46,22 @@ def create_participant(participant_id, block_id, prolific_id):
      return jsonify(result)
 
 # Get the bonus information: 
-@app.route("/participants_data/score/<participant_id>/<game_id>/<prolific_id>", methods=["POST", "GET"])
+@app.route("/participants_data_banditgame/score/<participant_id>/<game_id>/<prolific_id>", methods=["POST", "GET"])
 
 def get_participant_score(participant_id,game_id,prolific_id):
 
     # If the prolific_id is provided than look up based on the prolific UID
 
     if prolific_id =='undefined': 
-        query      = ParticipantsData.query.filter_by(participant_id=participant_id)
+        query      = ParticipantsDataBanditGame.query.filter_by(participant_id=participant_id)
     else:
-        query      = ParticipantsData.query.filter_by(prolific_id=prolific_id)
+        query      = ParticipantsDataBanditGame.BanditGamequery.filter_by(prolific_id=prolific_id)
 
 
     rel_perf        = query.all()    
     rel_perf_blocks = numpy.concatenate([numpy.array(rel_perf[i].get_block_perf().split(',')[-1:], dtype=numpy.float) for i in range(len(rel_perf))])
     
 
-    meanperf        = numpy.mean(rel_perf_blocks[2:])
     
     # Get the maxperf per block from the other table 
     query     = GameBlocks.query.filter_by(game_id=game_id)
@@ -83,17 +69,32 @@ def get_participant_score(participant_id,game_id,prolific_id):
 
    
     max_perf_blocks = numpy.concatenate([numpy.array(max_perf[i].get_maxreward().split(',')[-1:], dtype=numpy.float) for i in range(len(max_perf))])
-    meanmaxperf     = numpy.mean(max_perf_blocks[2:]) # exclude the first 2 training sessions 
+    
+    idx_neg = numpy.where(numpy.array(rel_perf_blocks[2:])<0)
+    idx_pos = numpy.where(numpy.array(rel_perf_blocks[2:])>0)
 
+    meanperf_pos  = numpy.mean(rel_perf_blocks[idx_pos])
+    meanperf_neg  = numpy.mean(rel_perf_blocks[idx_neg])
 
-    ratio = meanperf/meanmaxperf
+    meanmaxperf_pos  = numpy.mean(max_perf_blocks[idx_pos]) # exclude the first 2 training sessions 
+    meanmaxperf_neg  = numpy.mean(max_perf_blocks[idx_neg]) # exclude the first 2 training sessions 
 
-    app.logger.info(meanperf)
-    app.logger.info(meanmaxperf)
+    ratio = meanperf_pos/meanmaxperf_pos + (1-numpy.abs(meanperf_neg/meanmaxperf_neg))
+
+    print(rel_perf_blocks)
+    print(max_perf_blocks)
+    print([meanmaxperf_pos, meanmaxperf_neg])
+    print([meanperf_pos, meanperf_neg])
+    print(ratio)
+    
+    app.logger.info([meanperf_pos, meanperf_neg])
+    app.logger.info([meanmaxperf_pos, meanmaxperf_neg])
     app.logger.info(ratio)
     
+    if math.isnan(ratio): 
+        print('Ratio is nan')
 
-    if ratio < 0.5: 
+    if ratio < 0.5 or math.isnan(ratio): 
         bonus = 0
     elif ratio >= 1.0: 
          bonus = 1.0
@@ -108,10 +109,10 @@ def get_participant_score(participant_id,game_id,prolific_id):
     return jsonify(result), 200 # json.dumps(result)
 
 # To ge the data from this table 
-@app.route('/participants_data/<participant_id>/<block_id>', methods=['GET'])
+@app.route('/participants_data_banditgame/<participant_id>/<block_id>', methods=['GET'])
 
-def get_participant_data(participant_id,block_id):
-    query = ParticipantsData.query.filter(ParticipantsData.participant_id==participant_id,ParticipantsData.participant_id==block_id)
+def get_participant_data_banditgame(participant_id,block_id):
+    query = ParticipantsDataBanditGame.query.filter(ParticipantsDataBanditGame.participant_id==participant_id,ParticipantsDataBanditGame.participant_id==block_id)
     
     if query != None:
         print('Exists')
@@ -131,8 +132,11 @@ def get_participant_data(participant_id,block_id):
     arr_block                  = block.get_block_number()[0].replace('  ',' ').split(' ')
     result['block_number']     = arr_block[0]
 
-    arr_date                   = block.get_date()
-    result['date']             = arr_date
+    arr_feedback               = block.get_block_feedback()[0].replace('  ',' ').split(' ')
+    result['block_feedback']     = arr_feedback[0]
+
+    arr_learning               = block.get_block_learning()[0].replace('  ',' ').split(' ')
+    result['block_learning']   = arr_learning[0]
 
     arr_datetime                = block.get_date_time()
     result['date_time']         = arr_datetime

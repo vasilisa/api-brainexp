@@ -4,7 +4,7 @@ from sqlalchemy import Column, Integer, ForeignKey, DATETIME, Float, VARCHAR
 from models.db import Model
 from models.base_object import BaseObject
 
-class ParticipantsQuestionData(BaseObject, Model):
+class ParticipantsQuestionDataFollowUp(BaseObject, Model):
 
     '''
         This is the table where we put the collected QUESTIONNAIRE data from the participants in the RLVARTASK: this only contains the responses but not the question content which is stored in the JS object on the server. 
@@ -47,9 +47,6 @@ class ParticipantsQuestionData(BaseObject, Model):
     def get_completed(self): 
         return str(self.completed)
     
-    def get_date(self): 
-        return str(self.date)
-
     def get_date_time_survey_start(self): 
         return str(self.date_time_survey_start)
 
@@ -61,7 +58,7 @@ class ParticipantsQuestionData(BaseObject, Model):
     
     
     def errors(self):
-        errors = super(ParticipantsQuestionData, self).errors()
+        errors = super(ParticipantsQuestionDataFollowUp, self).errors()
         return errors
  
      

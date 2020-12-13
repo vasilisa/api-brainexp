@@ -25,6 +25,10 @@ def get_games(game_id,block_id):
 
     arr_block_feedback       = block.get_block_feedback()[0].replace('  ',' ').split(' ')
     result['block_feedback'] = arr_block_feedback[0]
+
+    arr_block_learning       = block.get_block_learning()[0].replace('  ',' ').split(' ')
+    result['block_learning'] = arr_block_learning[0]
+
     
     symbols         = {}
     symbols[str(0)] = str(block.get_symbol_1())
