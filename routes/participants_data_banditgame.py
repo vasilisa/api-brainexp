@@ -73,6 +73,11 @@ def get_participant_score(participant_id,game_id,prolific_id):
     idx_neg = numpy.where(numpy.array(rel_perf_blocks[2:])<0)
     idx_pos = numpy.where(numpy.array(rel_perf_blocks[2:])>0)
 
+    print(rel_perf_blocks)
+    print(max_perf_blocks)
+    print(idx_pos)
+    print(idx_neg) 
+
     meanperf_pos  = numpy.mean(rel_perf_blocks[idx_pos])
     meanperf_neg  = numpy.mean(rel_perf_blocks[idx_neg])
 
@@ -81,8 +86,6 @@ def get_participant_score(participant_id,game_id,prolific_id):
 
     ratio = meanperf_pos/meanmaxperf_pos + (1-numpy.abs(meanperf_neg/meanmaxperf_neg))
 
-    print(rel_perf_blocks)
-    print(max_perf_blocks)
     print([meanmaxperf_pos, meanmaxperf_neg])
     print([meanperf_pos, meanperf_neg])
     print(ratio)
