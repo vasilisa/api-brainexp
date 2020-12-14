@@ -1,7 +1,7 @@
 """users routes"""
 from flask import current_app as app, jsonify, request
 
-from models import ParticipantsQuestionDataFollowUp, BaseObject, db
+from models import ParticipantsQuestionData, BaseObject, db
 from collections import OrderedDict
 import numpy
 import json
@@ -10,10 +10,10 @@ from datetime import datetime
 import numpy as np 
 
 
-@app.route("/participants_question_data_followup/create/<participant_id>/<block_id>/<prolific_id>", methods=["POST","GET"])
+@app.route("/participants_question_data/create/<participant_id>/<block_id>/<prolific_id>", methods=["POST","GET"])
 def create_question_participant(participant_id,block_id,prolific_id):
      content     = request.json        
-     participant = ParticipantsQuestionDataFollowUp()
+     participant = ParticipantsQuestionData()
 
      participant.participant_id  = int(participant_id)
      participant.prolific_id     = str(prolific_id)
@@ -35,7 +35,7 @@ def create_question_participant(participant_id,block_id,prolific_id):
      return jsonify(result)
 
 # To ge the data from this table 
-@app.route('/participants_question_data_followup/<participant_id>/<block_id>', methods=['GET'])
+@app.route('/participants_question_data/<participant_id>/<block_id>', methods=['GET'])
 
 def get_participant_question_data(participant_id,block_id):
 

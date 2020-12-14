@@ -9,6 +9,7 @@ import json
 import math
 import glob
 from sqlalchemy.sql.expression import func
+from sqlalchemy import and_
 
 
 @app.route("/participants_data_banditgame/create/<participant_id>/<block_id>/<prolific_id>", methods=["POST", "GET"])
@@ -53,15 +54,23 @@ def get_participant_score(participant_id,game_id,prolific_id):
     # If the prolific_id is provided than look up based on the prolific UID
 
     if prolific_id =='undefined': 
-        query      = ParticipantsDataBanditGame.query.filter_by(participant_id=participant_id)
+        check      = ParticipantsDataBanditGame.query.filter_by(participant_id=participant_id) # START HERE WILL GET MULTIPLE GAMES INCORRETC
+        query      = ParticipantsDataBanditGame.query.filter(ParticipantsDataBanditGame.participant_id==participant_id).filter(ParticipantsDataBanditGame.game_id==game_id)
     else:
-        query      = ParticipantsDataBanditGame.query.filter_by(prolific_id=prolific_id)
+        # query      = ParticipantsDataBanditGame.query.filter_by(prolific_id=prolific_id)
+        query      = ParticipantsDataBanditGame.query.filter(ParticipantsDataBanditGame.prolific_id==prolific_id).filter(ParticipantsDataBanditGame.game_id==game_id)
+
+
 
 
     rel_perf        = query.all()    
     rel_perf_blocks = numpy.concatenate([numpy.array(rel_perf[i].get_block_perf().split(',')[-1:], dtype=numpy.float) for i in range(len(rel_perf))])
-    
 
+    check_perf        = check.all()    
+    check_perf_blocks = numpy.concatenate([numpy.array(check_perf[i].get_block_perf().split(',')[-1:], dtype=numpy.float) for i in range(len(rel_perf))])
+  
+    print(check_perf_blocks)
+    print(rel_perf_blocks)
     
     # Get the maxperf per block from the other table 
     query     = GameBlocks.query.filter_by(game_id=game_id)
