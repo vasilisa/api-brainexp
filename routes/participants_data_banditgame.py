@@ -58,9 +58,8 @@ def get_participant_score(participant_id,game_id,prolific_id):
         query      = ParticipantsDataBanditGame.query.filter(ParticipantsDataBanditGame.participant_id==participant_id).filter(ParticipantsDataBanditGame.game_id==game_id)
     else:
         # query      = ParticipantsDataBanditGame.query.filter_by(prolific_id=prolific_id)
+        check      = ParticipantsDataBanditGame.query.filter_by(prolific_id=prolific_id) # START HERE WILL GET MULTIPLE GAMES INCORRETC
         query      = ParticipantsDataBanditGame.query.filter(ParticipantsDataBanditGame.prolific_id==prolific_id).filter(ParticipantsDataBanditGame.game_id==game_id)
-
-
 
 
     rel_perf        = query.all()    
