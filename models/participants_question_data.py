@@ -22,6 +22,7 @@ class ParticipantsQuestionData(BaseObject, Model):
     question_ids            = Column(VARCHAR(length=1000), nullable=False)  # the survey block name /tag for the section 
     answers                 = Column(VARCHAR(length=10000), nullable=False) # an array with the string answers to each of the question items in the questionnaire block    
     completed               = Column(VARCHAR(length=100), nullable=False) # whether the survey has been completed, uncompleted or "aborted"
+    handle                  = Column(VARCHAR(length=200), nullable=False) # whether the survey has been completed, uncompleted or "aborted"
     
     def get_id(self):
         return str(self.id)
@@ -47,9 +48,6 @@ class ParticipantsQuestionData(BaseObject, Model):
     def get_completed(self): 
         return str(self.completed)
     
-    def get_date(self): 
-        return str(self.date)
-
     def get_date_time_survey_start(self): 
         return str(self.date_time_survey_start)
 
@@ -58,7 +56,10 @@ class ParticipantsQuestionData(BaseObject, Model):
 
     def get_date_time_survey_end(self): 
         return str(self.date_time_survey_end)
-    
+
+    def get_handle(self): 
+        return str(self.handle)
+
     
     def errors(self):
         errors = super(ParticipantsQuestionData, self).errors()
