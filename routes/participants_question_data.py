@@ -22,6 +22,8 @@ def create_question_participant(participant_id,block_id,prolific_id):
      participant.block_name      = str(content['block_name'])  
      participant.question_ids    = str(content['question_ids'])
      participant.answers         = str(content['answers'])
+     participant.handle          = content['handle']
+     
      
      participant.date_time_survey_start  = str(content['date_time_survey_start'])
      participant.date_time_survey_end    = str(content['date_time_survey_end'])
