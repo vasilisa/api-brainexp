@@ -44,6 +44,7 @@ def create_participant_banditgame(participant_id, block_id, prolific_id):
 
      result = dict({"success": "yes"})    
 
+     print('Saved block data')
      return jsonify(result)
 
 # Get the bonus information: 
@@ -54,21 +55,21 @@ def get_participant_score(participant_id,game_id,prolific_id):
     # If the prolific_id is provided than look up based on the prolific UID
 
     if prolific_id =='undefined': 
-        check      = ParticipantsDataBanditGame.query.filter_by(participant_id=participant_id) # START HERE WILL GET MULTIPLE GAMES INCORRETC
+#         check      = ParticipantsDataBanditGame.query.filter_by(participant_id=participant_id) # START HERE WILL GET MULTIPLE GAMES INCORRETC
         query      = ParticipantsDataBanditGame.query.filter(ParticipantsDataBanditGame.participant_id==participant_id).filter(ParticipantsDataBanditGame.game_id==game_id)
     else:
         # query      = ParticipantsDataBanditGame.query.filter_by(prolific_id=prolific_id)
-        check      = ParticipantsDataBanditGame.query.filter_by(prolific_id=prolific_id) # START HERE WILL GET MULTIPLE GAMES INCORRETC
+#         check      = ParticipantsDataBanditGame.query.filter_by(prolific_id=prolific_id) # START HERE WILL GET MULTIPLE GAMES INCORRETC
         query      = ParticipantsDataBanditGame.query.filter(ParticipantsDataBanditGame.prolific_id==prolific_id).filter(ParticipantsDataBanditGame.game_id==game_id)
 
 
     rel_perf        = query.all()    
     rel_perf_blocks = numpy.concatenate([numpy.array(rel_perf[i].get_block_perf().split(',')[-1:], dtype=numpy.float) for i in range(len(rel_perf))])
 
-    check_perf        = check.all()    
-    check_perf_blocks = numpy.concatenate([numpy.array(check_perf[i].get_block_perf().split(',')[-1:], dtype=numpy.float) for i in range(len(rel_perf))])
+#     check_perf        = check.all()    
+#     check_perf_blocks = numpy.concatenate([numpy.array(check_perf[i].get_block_perf().split(',')[-1:], dtype=numpy.float) for i in range(len(rel_perf))])
   
-    print(check_perf_blocks)
+#     print(check_perf_blocks)
     print(rel_perf_blocks)
     
     # Get the maxperf per block from the other table 
@@ -78,28 +79,25 @@ def get_participant_score(participant_id,game_id,prolific_id):
    
     max_perf_blocks = numpy.concatenate([numpy.array(max_perf[i].get_maxreward().split(',')[-1:], dtype=numpy.float) for i in range(len(max_perf))])
     
-    idx_neg = numpy.where(numpy.array(rel_perf_blocks[2:])<0)
+    # idx_neg = numpy.where(numpy.array(rel_perf_blocks[2:])<0)
     idx_pos = numpy.where(numpy.array(rel_perf_blocks[2:])>0)
 
     print(rel_perf_blocks)
     print(max_perf_blocks)
-    print(idx_pos)
-    print(idx_neg) 
 
     meanperf_pos  = numpy.mean(rel_perf_blocks[idx_pos])
-    meanperf_neg  = numpy.mean(rel_perf_blocks[idx_neg])
+    # meanperf_neg  = numpy.mean(rel_perf_blocks[idx_neg])
 
     meanmaxperf_pos  = numpy.mean(max_perf_blocks[idx_pos]) # exclude the first 2 training sessions 
-    meanmaxperf_neg  = numpy.mean(max_perf_blocks[idx_neg]) # exclude the first 2 training sessions 
+    # meanmaxperf_neg  = numpy.mean(max_perf_blocks[idx_neg]) # exclude the first 2 training sessions 
 
-    ratio = meanperf_pos/meanmaxperf_pos + (1-numpy.abs(meanperf_neg/meanmaxperf_neg))
+    ratio = meanperf_pos/meanmaxperf_pos # determine the bonus based on the reward learning as before  + (1-numpy.abs(meanperf_neg/meanmaxperf_neg))
 
-    print([meanmaxperf_pos, meanmaxperf_neg])
-    print([meanperf_pos, meanperf_neg])
+    # print([meanmaxperf_pos, meanmaxperf_neg])
     print(ratio)
     
-    app.logger.info([meanperf_pos, meanperf_neg])
-    app.logger.info([meanmaxperf_pos, meanmaxperf_neg])
+    app.logger.info([meanperf_pos])
+    app.logger.info([meanmaxperf_pos])
     app.logger.info(ratio)
     
     if math.isnan(ratio): 
